@@ -61,11 +61,12 @@ def get_answers(query):
 def main():
     load_dotenv()
     add_auth(required=True)
-
+    
     #after authentication, the email and subscription status is stored in session state
     st.write(st.session_state.email)
     st.write(st.session_state.user_subscribed)
-    
+    with open(".streamlit/users.txt", "w") as f:
+        f.write(f"{st.session_state.email} subscribed: {st.session_state.user_subscribed}")
 
     st.write(unsafe_allow_html=True)
     
