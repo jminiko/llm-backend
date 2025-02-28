@@ -56,17 +56,17 @@ def get_answers(query):
     
     response = chain.run(input_documents=doc_search, question=query)
 
-    return response,doc_search
+    return response
 
 def main():
     load_dotenv()
-    add_auth(required=True)
-    
+
+#    add_auth(required=False)    
     #after authentication, the email and subscription status is stored in session state
-    st.write(st.session_state.email)
-    st.write(st.session_state.user_subscribed)
-    with open(".streamlit/users.txt", "w") as f:
-        f.write(f"{st.session_state.email} subscribed: {st.session_state.user_subscribed}")
+ #   st.write(st.session_state.email)
+  #  st.write(st.session_state.user_subscribed)
+   # with open(".streamlit/users.txt", "w") as f:
+    #    f.write(f"{st.session_state.email} subscribed: {st.session_state.user_subscribed}")
 
     st.write(unsafe_allow_html=True)
     
@@ -78,22 +78,27 @@ def main():
     
     
 
-    st.set_page_config(page_title="Samia CV")
+
     st.header("Je suis ton assistant IA pour t'aider à trouver des CV.💭")
     
     # show user input
-    user_question = st.text_input("Pose ta question:")
-    if user_question:
-        st.write(f"Question: {user_question}")
-        answer = get_answers(user_question)
+    with st.form("my_form"):
+
+        user_question = st.text_area("Pose ta question:")
+        # Every form must have a submit button.
+        submitted = st.form_submit_button("Aller...")
+        if submitted:
+            if user_question:
+                st.write(f"Question: {user_question}")
+                answer = get_answers(user_question)
         
-        st.write(f"Answer: {answer}")
-        docs = embeddings.embed_query(user_question)
+                st.write(f"Answer: {answer}")
+                docs = embeddings.embed_query(user_question)
         
-        answer =  search_vdb(user_question)
-        for doc in answer:
-            pdf_viewer(doc.dict()['metadata']['source'],
-                   width=700)
+                answer =  search_vdb(user_question)
+                for doc in answer:
+                    pdf_viewer(doc.dict()['metadata']['source'],
+                    width=700)
 
 if __name__ == '__main__':
     main()
