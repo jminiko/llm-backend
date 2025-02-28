@@ -4,7 +4,7 @@ import openai
 import langchain
 from uuid import uuid4
 import streamlit as st
-
+from st_paywall import add_auth
 import qdrant_client
 from langchain_community.document_loaders import PyPDFDirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -39,7 +39,6 @@ vector_store = QdrantVectorStore.from_existing_collection(
 retriever = vector_store.as_retriever()
 
 
-
 def get_data(query, k=2):
     matching_results = vector_store.similarity_search(query, k=k)
     return matching_results
@@ -61,6 +60,11 @@ def get_answers(query):
 
 def main():
     load_dotenv()
+    add_auth(required=True)
+
+    #after authentication, the email and subscription status is stored in session state
+    st.write(st.session_state.email)
+    st.write(st.session_state.user_subscribed)
     
 
     st.write(unsafe_allow_html=True)
