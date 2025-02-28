@@ -13,14 +13,16 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain_mistralai.chat_models import ChatMistralAI
 load_dotenv()
 
-mistral_api_key = os.getenv('MistralAI')
-qdrant_uri = os.getenv('Qdrant_URL')
-qdrant_api_key = os.getenv('Qdrant_API_KEY')
-vectors_size = os.getenv('VectorsSIZE')
-collection_name = os.getenv('CollectionIndex')
+qdrant_api_key = os.getenv('QDRANT_API_KEY')
+qdrant_url = os.getenv('QDRANT_URL')
+collection_name = os.getenv('COLLECTION_NAME')
+mistral_api_key = os.getenv('MISTRAL_API_KEY')
+vectors_size = os.getenv('VECTOR_SIZE')
+hf_token =  os.environ["HF_TOKEN"]
+directory_path = os.environ["DIRECTORY_PATH"]
 
 client = qdrant_client.QdrantClient(
-    url=qdrant_uri,
+    url=qdrant_url,
 )
 
 if not client.collection_exists(collection_name):
@@ -28,8 +30,12 @@ if not client.collection_exists(collection_name):
       collection_name=collection_name,
       vectors_config=VectorParams(size=1024, distance=Distance.COSINE)  
     )
+def read_pdf(directory):
+    file_loader = PyPDFDirectoryLoader(directory)
+    documents = file_loader.load()
+    return documents
     
-doc = read_pdf(DIRECTORY_PATH)
+doc = read_pdf(directory_path)
 
 len(doc)
 
@@ -44,5 +50,5 @@ embeddings = MistralAIEmbeddings(model="mistral-embed", api_key=mistral_api_key)
 vector_store = QdrantVectorStore.from_existing_collection(
     embedding=embeddings,
     collection_name=collection_name,
-    url=qdrant_uri,)
+    url=qdrant_url,)
 vector_store.add_documents(documents=doc)

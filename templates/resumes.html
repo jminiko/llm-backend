@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class="alert">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+    <div class="container mt-5">
+        <h3>CV Management</h3>
+        <form method="POST" enctype="multipart/form-data" action="">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.cv.label(class="form-control-label") }}
+                {{ form.cv(class="form-control-file") }}
+            </div>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+        {%if cv%}
+        <div class="mt-4">
+            <h4>Uploaded CV</h4>
+            <ul class="list-group">
+                <a href="{{url_for('download_cv', cv_id=cv.id, download=1) }}"> {{ cv.filename }}</a>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    
+                    <object class="pdf" 
+            data="{{url_for('download_cv', cv_id=cv.id, download=0) }}"
+            width="800"
+            height="500"/>
+                </li>
+                
+            </ul>
+        </div>
+        {%endif%}
+    </div>
+{% endblock %}

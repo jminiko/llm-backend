@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application de Recherche</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Application de Recherche</h1>
+        </header>
+        
+        <main>
+            <section class="search-section">
+                <form action="/" method="GET" class="search-form">
+                    <textarea 
+                        type="text" 
+                        name="query" 
+                        placeholder="Entrez votre recherche..." 
+                        value="{{ search_query }}"
+                        class="search-input"
+                    ></textarea><br/>
+                    <button type="submit" class="search-button">Rechercher</button>
+                </form>
+            </section>
+            
+            <section class="results-section">
+                <h2>Résultats{% if search_query %} pour "{{ search_query }}"{% endif %}</h2>
+                
+                {% if results %}
+                    <ul class="results-list">
+                        {% for item in results %}
+                            <li class="result-item">
+                                <h3>{{ item.name }}</h3>
+                                <p>{{ item.description }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="no-results">Aucun résultat trouvé.</p>
+                {% endif %}
+            </section>
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 Application de Recherche</p>
+        </footer>
+    </div>
+</body>
+</html>

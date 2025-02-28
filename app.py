@@ -1,100 +1,43 @@
-from dotenv import load_dotenv
-import os
-import openai
-import langchain
-from uuid import uuid4
-import streamlit as st
-
-import qdrant_client
-from langchain_community.document_loaders import PyPDFDirectoryLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_mistralai import MistralAIEmbeddings
-from langchain_qdrant import QdrantVectorStore
-from qdrant_client.models import VectorParams,Distance
-from langchain.chains.question_answering import load_qa_chain
-from langchain_mistralai.chat_models import ChatMistralAI
-#from htmlTemplates import bot_template, user_template, css
-load_dotenv()
-qdrant_api_key = os.getenv('QDRANT_API_KEY')
-qdrant_url = os.getenv('QDRANT_URL')
-collection_name = os.getenv('COLLECTION_NAME')
-mistral_api_key = os.getenv('MISTRAL_API_KEY')
-vectors_size = os.getenv('VECTOR_SIZE')
-hf_token =  os.environ["HF_TOKEN"]
-directory_path = os.environ["DIRECTORY_PATH"]
-
-def read_pdf(directory):
-    file_loader = PyPDFDirectoryLoader(directory)
-    documents = file_loader.load()
-    return documents
+from flask import Flask, render_template, request
 
 
-embeddings = MistralAIEmbeddings(model="mistral-embed", api_key=mistral_api_key)
-vector_store = QdrantVectorStore.from_existing_collection(
-    embedding=embeddings,
-    collection_name=collection_name,
-    url=qdrant_url,)
+app = Flask(__name__)
 
-retriever = vector_store.as_retriever()
+UPLOAD_FOLDER = 'uploads/cv'
+ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx'}
 
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['SECRET_KEY'] = 'QmSOeEOdiDIAwqQNkSKqSJDEIOQSKslskDslk'  # Change this to a secure secret key
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
+app.secret_key =  'MyVerySecretKeyQsQmslDopPSlEZqJ'
 
+app.config['RAGTIME_COMPS_PER_PAGE'] = 10
 
-def get_data(query, k=2):
-    matching_results = vector_store.similarity_search(query, k=k)
-    return matching_results
+# Sample data for demonstration
+sample_data = [
+    {"id": 1, "name": "Python Programming", "description": "Learn Python programming language"},
+    {"id": 2, "name": "Flask Framework", "description": "Web development with Flask"},
+    {"id": 3, "name": "Database Design", "description": "Learn database design principles"},
+    {"id": 4, "name": "API Development", "description": "Create RESTful APIs with Flask"},
+    {"id": 5, "name": "Web Security", "description": "Security best practices for web applications"}
+]
 
-llm= ChatMistralAI(api_key=mistral_api_key,model="mistral-large-latest")
-chain = load_qa_chain(llm, chain_type="stuff")
-
-def get_answers(query):
-    doc_search = get_data(query)
-    print(doc_search)
-    response = chain.run(input_documents=doc_search, question=query)
-
-    return response
-
-
-def handle_user_input(question):
-
-    response = st.session_state.conversation({'question':question})
-    st.session_state.chat_history = response['chat_history']
-    #print(response)
-    for i, message in enumerate(st.session_state.chat_history):
-        if i % 2 == 0: # user question
-            st.write(user_template.replace("{{MSG}}", message.content), unsafe_allow_html=True)
-        else:          # bot answer
-            print(message)
-            st.write(bot_template.replace("{{MSG}}", message.content), unsafe_allow_html=True)
-    results = vector_store.similarity_search("find a java developer",k=2)
-    for res in results:
-        print(f"* {res.page_content} [{res.metadata}]")
-
-
-
-def main():
-    load_dotenv()
-    #st.set_page_config(page_title='Chat avec tes propres PDFs', page_icon=':books:')
-
-    st.write(unsafe_allow_html=True)
+@app.route('/', methods=['GET'])
+def index():
+    search_query = request.args.get('query', '')
     
-    if "conversation" not in st.session_state:
-        st.session_state.conversation = None
-
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = None
+    if search_query:
+        # Filter data based on search query
+        results = [item for item in sample_data if search_query.lower() in item['name'].lower() 
+                  or search_query.lower() in item['description'].lower()]
+    else:
+        results = sample_data
     
-    
-
-    st.set_page_config(page_title="Samia CV")
-    st.header("Je suis ton assistant IA pour t'aider à trouver des CV.💭")
-    
-    # show user input
-    user_question = st.text_input("Pose ta question:")
-    if user_question:
-        st.write(f"Question: {user_question}")
-        answer = get_answers(user_question)
-        st.write(f"Answer: {answer}")
-
+    return render_template('index.html', results=results, search_query=search_query)
 
 if __name__ == '__main__':
-    main()
+    app.run(debug=True, host='0.0.0.0', port=5000)
+
+
+    
