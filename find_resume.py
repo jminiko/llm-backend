@@ -47,7 +47,7 @@ llm= ChatMistralAI(api_key=mistral_api_key,model="mistral-large-latest")
 chain = load_qa_chain(llm, chain_type="stuff")
 
 
-def search_vdb(query):
+def search_vector_db(query):
     doc_search = get_data(query)
     return doc_search
 
@@ -95,9 +95,9 @@ def main():
                 st.write(f"Answer: {answer}")
                 docs = embeddings.embed_query(user_question)
         
-                answer =  search_vdb(user_question)
+                answer =  search_vector_db(user_question)
                 for doc in answer:
-                    pdf_viewer(input=doc.dict()['metadata']['source'],key=doc.dict()['metadata']['source'],
+                    pdf_viewer(input=doc.dict()['metadata']['file_path'],key=doc.dict()['metadata']['chunk_id'],
                     width=700)
 
 if __name__ == '__main__':
