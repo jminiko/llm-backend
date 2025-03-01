@@ -9,6 +9,7 @@ import uuid
 from qdrant_client import QdrantClient, models
 from langchain_community.vectorstores import Qdrant
 from qdrant_client.models import VectorParams,Distance,PointStruct
+import shutil
 
 load_dotenv()
 qdrant_api_key = os.getenv('QDRANT_API_KEY')
@@ -30,6 +31,7 @@ qdrant_client = QdrantClient(url=qdrant_url, prefer_grpc=True)
 def pdf_path_to_document(pdf_path):
     loader = PyPDFLoader(pdf_path)
     documents = loader.load()
+
     langchain_documents = []
     for doc in documents:
         langchain_documents.append(
@@ -44,7 +46,7 @@ def pdf_path_to_document(pdf_path):
         )
     return langchain_documents
 
-def split_pdf(pdf_path, chunk_size=10000, chunk_overlap=0):
+def split_pdf(pdf_path, chunk_size=3800, chunk_overlap=0):
     langchain_documents = pdf_path_to_document(pdf_path)
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
@@ -69,13 +71,14 @@ def add_to_qdrant(chunks, embeddings):
     #point = PointStruct(id=unique_id, vector={"default": embeddings}, payload=chunks)
     #info = qdrant_client.upsert(collection_name=collection_name, points=[point])
     qdrant = Qdrant.from_documents(
-        chunks,
-        embeddings,
-        collection_name=collection_name,
-        url=qdrant_url,
-        prefer_grpc=True,
+            chunks,
+            embeddings,
+            collection_name=collection_name,
+            url=qdrant_url,
+            prefer_grpc=True,
     )
-
+    print("added to qdrant")
+    
 def add_unique_id(chunks,file,root):
     for chunk in chunks:
         chunk.metadata = {}
@@ -92,11 +95,18 @@ def create_chunks():
                 print(f"{root}/{file}")
                 chunks = split_pdf(f"{root}/{file}")
                 add_unique_id(chunks,file,root)
-                add_to_qdrant(chunks, openai_embeddings)
+                try:
+                    os.remove(f"{root}/{file}")
+                    add_to_qdrant(chunks, openai_embeddings)
+                    shutil.move(f"{root}/{file}", f"/root/SamIA/hw/processed//{file}") 
+                except:
+                    
+                    pass
+
                 
 
 get_or_create_collection()
-chunks = create_chunks()
+create_chunks()
 
 
 

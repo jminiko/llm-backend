@@ -39,7 +39,7 @@ vector_store = QdrantVectorStore.from_existing_collection(
 retriever = vector_store.as_retriever()
 
 
-def get_data(query, k=2):
+def get_data(query, k=5):
     matching_results = vector_store.similarity_search(query, k=k)
     return matching_results
 
@@ -62,12 +62,13 @@ def main():
     load_dotenv()
 
     
-    #add_auth(required=True)    
+    add_auth(required=True)    
     #after authentication, the email and subscription status is stored in session state
-    #st.write(st.session_state.email)
+    st.write(f"vous êtes: {st.session_state.email}")
+    st.write("La recherche est limitée à 5 CV maximum")
     #st.write(st.session_state.user_subscribed)
-    #with open(".streamlit/users.txt", "w") as f:
-    #    f.write(f"{st.session_state.email} subscribed: {st.session_state.user_subscribed}")
+    with open(".streamlit/users.txt", "w") as f:
+        f.write(f"{st.session_state.email} subscribed: {st.session_state.user_subscribed}")
     
     st.write(unsafe_allow_html=True)
     
@@ -98,8 +99,10 @@ def main():
         
                 answer =  search_vector_db(user_question)
                 for doc in answer:
-                    pdf_viewer(input=doc.dict()['metadata']['file_path'],key=doc.dict()['metadata']['chunk_id'],
-                    width=700)
+                    path = doc.dict()['metadata']['file_path']
+                    path = path.replace('resume_main','main')
+                    print(path)
+                    pdf_viewer(input=path,key=doc.dict()['metadata']['chunk_id'],width=700)
 
 if __name__ == '__main__':
     main()

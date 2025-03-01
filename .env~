@@ -1,9 +1,9 @@
 QDRANT_API_KEY = "APIKEY"
 QDRANT_URL = "http://localhost:6333"
-COLLECTION_NAME = "index-resume"
+COLLECTION_NAME = "index-resume-final"
 COLLECTION_NAME_FINAL = "index-resume-final"
 MISTRAL_API_KEY = "CKM7tMrMkngxZrlKE9cP8Qjk5x6jIVYY"
 VECTOR_SIZE = 1024
 HF_TOKEN = "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"
-DIRECTORY_PATH = "/root/SamIA/llm-backend/resume_main"
-DIRECTORY_PATH2 = "/root/SamIA/resumes_hw/"
+DIRECTORY_PATH = "/root/SamIA/hw/resume_main"
+DIRECTORY_PATH2 = "/root/SamIA/hw/test2/"
