@@ -17,10 +17,10 @@ from llama_index.core import Settings
 
 
 QDRANT_URL = "http://localhost:6333"
-QDRANT_COLLECTION = "index-resume-final"
+QDRANT_COLLECTION = "index-resume"
 MISTRAL_API_KEY =   "CKM7tMrMkngxZrlKE9cP8Qjk5x6jIVYY"
-DIRECTORY_PATH = "/root/SamIA/resumes_hw2/"
-#DIRECTORY_PATH = "/home/jminiko/insync/developpement/python/21talents/SamIA/llamaindex/resume_main/"
+#DIRECTORY_PATH = "/root/SamIA/resumes_hw2/"
+DIRECTORY_PATH = "/home/jminiko/insync/developpement/python/21talents/SamIA/llamaindex/resume_main/"
 logging.info("Initializing llm")
 
 llm = MistralAI(api_key=MISTRAL_API_KEY, model="mistral-small")

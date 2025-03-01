@@ -97,7 +97,7 @@ def main():
         
                 answer =  search_vdb(user_question)
                 for doc in answer:
-                    pdf_viewer(doc.dict()['metadata']['source'],
+                    pdf_viewer(input=doc.dict()['metadata']['source'],key=doc.dict()['metadata']['source'],
                     width=700)
 
 if __name__ == '__main__':
