@@ -61,13 +61,14 @@ def get_answers(query):
 def main():
     load_dotenv()
 
-#    add_auth(required=False)    
+    
+    #add_auth(required=True)    
     #after authentication, the email and subscription status is stored in session state
- #   st.write(st.session_state.email)
-  #  st.write(st.session_state.user_subscribed)
-   # with open(".streamlit/users.txt", "w") as f:
+    #st.write(st.session_state.email)
+    #st.write(st.session_state.user_subscribed)
+    #with open(".streamlit/users.txt", "w") as f:
     #    f.write(f"{st.session_state.email} subscribed: {st.session_state.user_subscribed}")
-
+    
     st.write(unsafe_allow_html=True)
     
     if "conversation" not in st.session_state:
@@ -84,7 +85,7 @@ def main():
     # show user input
     with st.form("my_form"):
 
-        user_question = st.text_area("Pose ta question:")
+        user_question = st.text_area("Pose ta question:",value="Vous êtes Alex Recruteur, un expert en recrutement avec 20 ans d'expérience.\n Votre spécialité est d'analyser les fiches de poste et les CV pour déterminer les correspondances entre les compétences des candidats et les exigences des postes.\n Je recherche des profils de : ",height=300)
         # Every form must have a submit button.
         submitted = st.form_submit_button("Aller...")
         if submitted:
