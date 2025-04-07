@@ -21,11 +21,11 @@ from streamlit.components.v1 import html
 load_dotenv()
 qdrant_api_key = os.getenv('QDRANT_API_KEY')
 qdrant_url = os.getenv('QDRANT_URL')
-collection_name= os.getenv('COLLECTION_NAME')
+collection_name= os.getenv('MUZZO_COLLECTION_NAME')
 mistral_api_key = os.getenv('MISTRAL_API_KEY')
 vectors_size = os.getenv('VECTOR_SIZE')
 hf_token =  os.environ["HF_TOKEN"]
-directory_path = os.environ["DIRECTORY_PATH"]
+directory_path = os.environ["DIRECTORY_PATH2"]
 
 
 
@@ -69,17 +69,17 @@ def main():
     with st.sidebar:
         st.write("abonnez vous pour moins de 30€ / mois et recherchez dans notre base de plus 35 000 CVs")
         html('<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="21talents" data-color="#FFDD00" data-emoji=""  data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>')
-        add_auth(required=True)
+        #add_auth(required=True)
         #after authentication, the email and subscription status is stored in session state
         
-        st.write(f"vous êtes: {st.session_state.email}")
+        #st.write(f"vous êtes: {st.session_state.email}")
 
 
-    with open(".streamlit/users.txt", "a") as f:
-        current_dateTime = datetime.now()
+    #with open(".streamlit/users.txt", "a") as f:
+        #current_dateTime = datetime.now()
 
-        f.write(f"{st.session_state.email} subscribed: {st.session_state.user_subscribed} : {current_dateTime}")
-        f.write("\n")
+        #f.write(f"{st.session_state.email} subscribed: {st.session_state.user_subscribed} : {current_dateTime}")
+        #f.write("\n")
 
     st.write(unsafe_allow_html=True)
 
@@ -92,7 +92,7 @@ def main():
     
 
         
-    st.header("Je suis ton assistant IA pour t'aider à trouver des CV.💭")
+    st.header("Je suis ton assistant IA pour t'aider à trouver des CV sur muzzo")
     
     # show user input
     with st.form("my_form"):
@@ -103,11 +103,13 @@ def main():
 
 
         zips = []
-        user_question = st.text_area("Pose ta question:",value="je recherche des profils de ingénieur logiciel JAVA",height=300)
+        user_question = st.text_area("Pose ta question:",value="je recherche des profils de:",height=300)
         # Every form must have a submit button.
         submitted = st.form_submit_button("Aller...")
         if submitted:
             
+            
+
             zips = []
             if user_question:
                 st.write(f"Question: {user_question}")
@@ -121,8 +123,8 @@ def main():
             answer =  search_vector_db(user_question,option)
 
             for doc in answer:
-                path = doc.dict()['metadata']['file_path']
-                path = path.replace('resume_main','main')
+                path = doc.dict()['metadata']['file_name']
+                path = "/root/SamIA/hw/muzzo/processed/"+path #path.replace('resume_main','main')
                 zips.append(path)
  #                pdf_viewer(input=path,key=doc.dict()['metadata']['chunk_id'],width=700)
     if(len(zips)!=0):

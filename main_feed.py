@@ -1,3 +1,4 @@
+#import the pdf stored in directory_path
 import os
 from dotenv import load_dotenv
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -10,11 +11,13 @@ from qdrant_client import QdrantClient, models
 from langchain_community.vectorstores import Qdrant
 from qdrant_client.models import VectorParams,Distance,PointStruct
 import shutil
+from datetime import datetime
+
 
 load_dotenv()
 qdrant_api_key = os.getenv('QDRANT_API_KEY')
 qdrant_url = os.getenv('QDRANT_URL')
-collection_name = os.getenv('COLLECTION_NAME')
+collection_name = os.getenv('MUZZO_COLLECTION_NAME')
 mistral_api_key = os.getenv('MISTRAL_API_KEY')
 vectors_size = os.getenv('VECTOR_SIZE')
 hf_token =  os.environ["HF_TOKEN"]
@@ -80,14 +83,17 @@ def add_to_qdrant(chunks, embeddings):
     print("added to qdrant")
     
 def add_unique_id(chunks,file,root):
+    current_dateTime = datetime.now()
     for chunk in chunks:
         chunk.metadata = {}
         chunk.metadata["chunk_id"] =str(uuid.uuid4())
         chunk.metadata["file_name"] = file
+        chunk.metadata["date"] = current_dateTime
         chunk.metadata["file_path"] = f"{root}/{file}"
         
     return chunks
 
+#directory_path = /root/SamIA/hw/muzzo.io/muzzo
 def create_chunks():
     for root, dirs, files in os.walk(directory_path):
         for file in files:
@@ -96,9 +102,9 @@ def create_chunks():
                 chunks = split_pdf(f"{root}/{file}")
                 add_unique_id(chunks,file,root)
                 try:
-                    os.remove(f"{root}/{file}")
+                    #os.remove(f"{root}/{file}")
                     add_to_qdrant(chunks, openai_embeddings)
-                    shutil.move(f"{root}/{file}", f"/root/SamIA/hw/processed//{file}") 
+                    shutil.move(f"{root}/{file}", f"/root/SamIA/hw/muzzo/processed/{file}")
                 except:
                     
                     pass
