@@ -144,5 +144,4 @@ if(len(zips)!=0):
             mime="application/zip"
         )
         st.write(btn)
-if __name__ == '__main__':
-    main()
+
