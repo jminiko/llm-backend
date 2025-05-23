@@ -16,3 +16,6 @@ prompt_muzzo = st.text_area("Prompt",value=prompt_muzzo,height=300)
 if st.button("Sauver"):
     with open(".streamlit/prompt_muzzo.cfg", "w") as f:
         f.write(prompt_muzzo)
+
+if __name__ == '__main__':
+    main()
