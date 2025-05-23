@@ -64,83 +64,83 @@ def get_answers(query,k):
 
     return response
 
-def main():
-    load_dotenv()
-    with st.sidebar:
-        st.write("abonnez vous pour moins de 30€ / mois et recherchez dans notre base de plus 35 000 CVs")
-        html('<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="21talents" data-color="#FFDD00" data-emoji=""  data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>')
-        add_auth(required=True)
-        #after authentication, the email and subscription status is stored in session state
+load_dotenv()
+with st.sidebar:
+    st.write("abonnez vous pour moins de 30€ / mois et recherchez dans notre base de plus 35 000 CVs")
+    html('<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="21talents" data-color="#FFDD00" data-emoji=""  data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>')
+    add_auth(required=True)
+    #after authentication, the email and subscription status is stored in session state
+    
+    st.write(f"vous êtes: {st.session_state.email}")
+
+
+with open(".streamlit/users.txt", "a") as f:
+    current_dateTime = datetime.now()
+
+    f.write(f"{st.session_state.email} subscribed: {st.session_state.user_subscribed} : {current_dateTime}")
+    f.write("\n")
+
+st.write(unsafe_allow_html=True)
+with open(".streamlit/prompt.cfg", "r") as f:
+    prompt = f.read()
+if "conversation" not in st.session_state:
+    st.session_state.conversation = None
+
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = None
+
+
+
+    
+st.header("Je suis ton assistant IA pour t'aider à trouver des CV.💭")
+
+# show user input
+with st.form("my_form"):
+    option = st.selectbox(
+        "Nombre de CV en retour",
+        ("", "10", "20","50","100"),
+    )
+
+
+    zips = []
+    user_question = st.text_area("Pose ta question:",value=prompt,height=300)
+    # Every form must have a submit button.
+    submitted = st.form_submit_button("Aller...")
+    if submitted:
         
-        st.write(f"vous êtes: {st.session_state.email}")
-
-
-    with open(".streamlit/users.txt", "a") as f:
-        current_dateTime = datetime.now()
-
-        f.write(f"{st.session_state.email} subscribed: {st.session_state.user_subscribed} : {current_dateTime}")
-        f.write("\n")
-
-    st.write(unsafe_allow_html=True)
-
-    if "conversation" not in st.session_state:
-        st.session_state.conversation = None
-
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = None
-    
-    
-
-        
-    st.header("Je suis ton assistant IA pour t'aider à trouver des CV.💭")
-    
-    # show user input
-    with st.form("my_form"):
-        option = st.selectbox(
-            "Nombre de CV en retour",
-            ("", "10", "20","50","100"),
-        )
-
-
         zips = []
-        user_question = st.text_area("Pose ta question:",value="Tu es un recruteur expérimenté avec plus de 20 ans d’expérience. Dans notre logiciel de gestion des candidatures, identifie les meilleurs candidats pour [préciser ici le poste ou l’appel d’offres]. Critères de sélection : Compétences clés. Expérience professionnelle pertinente. Disponibilité. Filtre obligatoire : Ne retiens que les candidats ayant un taux de correspondance supérieur ou égal à 75 %. Pour chaque candidat retenu, présente les informations suivantes dans un tableau clair : Pourcentage de correspondance (en %). Nom du fichier CV (permettant d’identifier le document sans ambiguïté). Adresse e-mail. Numéro de téléphone. Brève justification (1 à 2 phrases max) expliquant ce pourcentage (ex. : années d'expérience, technologies maîtrisées, missions similaires, etc.). Important : chaque CV doit être unique (ne pas réutiliser plusieurs fois le même document). Prends le temps nécessaire pour fournir une liste détaillée, fiable et exhaustive.",height=300)
-        # Every form must have a submit button.
-        submitted = st.form_submit_button("Aller...")
-        if submitted:
-            
-            zips = []
-            if user_question:
-                st.write(f"Question: {user_question}")
-                if(option==""):
-                    option = 5
+        if user_question:
+            st.write(f"Question: {user_question}")
+            if(option==""):
+                option = 5
 
-            answer = get_answers(user_question,option)
-            st.write(f"Answer: {answer}")
-            docs = embeddings.embed_query(user_question)
-        
-            answer =  search_vector_db(user_question,option)
+        answer = get_answers(user_question,option)
+        st.write(f"Answer: {answer}")
+        docs = embeddings.embed_query(user_question)
+    
+        answer =  search_vector_db(user_question,option)
 
-            for doc in answer:
-                path = doc.dict()['metadata']['file_path']
-                path = path.replace('resume_main','main')
-                zips.append(path)
- #                pdf_viewer(input=path,key=doc.dict()['metadata']['chunk_id'],width=700)
-    if(len(zips)!=0):
-        unique_id = str(uuid.uuid4())
-        
-        with ZipFile(f"resultat-{unique_id}.zip",'w') as zip:
-            # writing each file one by one 
-            for file in zips:
-                abs_src = os.path.abspath(file)
-                arcname = os.path.basename(abs_src) 
-                zip.write(file,arcname)
-        with open(f"resultat-{unique_id}.zip", "rb") as fp:
-            btn = st.download_button(
-                label="Download ZIP",
-                data=fp,
-                file_name=f"myfile-{unique_id}.zip",
-                mime="application/zip"
-            )
-            st.write(btn)
+        for doc in answer:
+            path = doc.dict()['metadata']['file_path']
+            path = path.replace('resume_main','main')
+            zips.append(path)
+#                pdf_viewer(input=path,key=doc.dict()['metadata']['chunk_id'],width=700)
+if(len(zips)!=0):
+    unique_id = str(uuid.uuid4())
+    
+    with ZipFile(f"resultat-{unique_id}.zip",'w') as zip:
+        # writing each file one by one 
+        for file in zips:
+            abs_src = os.path.abspath(file)
+            arcname = os.path.basename(abs_src) 
+            zip.write(file,arcname)
+    with open(f"resultat-{unique_id}.zip", "rb") as fp:
+        btn = st.download_button(
+            label="Download ZIP",
+            data=fp,
+            file_name=f"myfile-{unique_id}.zip",
+            mime="application/zip"
+        )
+        st.write(btn)
 if __name__ == '__main__':
     main()
