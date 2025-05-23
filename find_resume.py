@@ -103,7 +103,7 @@ def main():
 
 
         zips = []
-        user_question = st.text_area("Pose ta question:",value="je recherche des profils de ingénieur logiciel JAVA",height=300)
+        user_question = st.text_area("Pose ta question:",value="Tu es un recruteur expérimenté avec plus de 20 ans d’expérience. Dans notre logiciel de gestion des candidatures, identifie les meilleurs candidats pour [préciser ici le poste ou l’appel d’offres]. Critères de sélection : Compétences clés. Expérience professionnelle pertinente. Disponibilité. Filtre obligatoire : Ne retiens que les candidats ayant un taux de correspondance supérieur ou égal à 75 %. Pour chaque candidat retenu, présente les informations suivantes dans un tableau clair : Pourcentage de correspondance (en %). Nom du fichier CV (permettant d’identifier le document sans ambiguïté). Adresse e-mail. Numéro de téléphone. Brève justification (1 à 2 phrases max) expliquant ce pourcentage (ex. : années d'expérience, technologies maîtrisées, missions similaires, etc.). Important : chaque CV doit être unique (ne pas réutiliser plusieurs fois le même document). Prends le temps nécessaire pour fournir une liste détaillée, fiable et exhaustive.",height=300)
         # Every form must have a submit button.
         submitted = st.form_submit_button("Aller...")
         if submitted:

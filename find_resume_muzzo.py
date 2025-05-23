@@ -83,6 +83,8 @@ def main():
 
     st.write(unsafe_allow_html=True)
 
+    with open(".streamlit/prompt_muzzo.cfg", "r") as f:
+        prompt = f.read()
     if "conversation" not in st.session_state:
         st.session_state.conversation = None
 
@@ -103,7 +105,7 @@ def main():
 
 
         zips = []
-        user_question = st.text_area("Pose ta question:",value="je recherche des profils de:",height=300)
+        user_question = st.text_area("Pose ta question:",value=prompt,height=300)
         # Every form must have a submit button.
         submitted = st.form_submit_button("Aller...")
         if submitted:
